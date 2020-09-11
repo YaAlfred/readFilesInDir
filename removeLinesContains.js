@@ -1,7 +1,8 @@
 const fs = require('fs');
-
+let operationsLeft = 350;
 const fixFilesInFolder = (dir, ext, wordToRemove) => fs.readdir(dir, {withFileTypes: true}, (err, files) => {
     if (err) throw err;
+    if (operationsLeft === 0) return;
     files.forEach(dirent => {
         if(dirent.isDirectory()) {
             //read next
@@ -14,7 +15,9 @@ const fixFilesInFolder = (dir, ext, wordToRemove) => fs.readdir(dir, {withFileTy
                 console.log(fileName, "is ready to fix");
                 fs.readFile(fileName, "utf8", (err, data) => {
                     if (err) throw err;
-                    if (data.indexOf(wordToRemove) !== -1) {
+                    if (data.indexOf(wordToRemove) !== -1 && operationsLeft !== 0) {
+                        console.log('remove ' + operationsLeft);
+                        operationsLeft = operationsLeft - 1;
                         let removedDefineLines = data.split('\n')
                             .filter((line) => line.indexOf(wordToRemove) === -1)
                             .join('\n');
@@ -30,4 +33,4 @@ const fixFilesInFolder = (dir, ext, wordToRemove) => fs.readdir(dir, {withFileTy
     });
 });
 
-fixFilesInFolder("./src", "js", "wordToRemove");
+fixFilesInFolder("./src", "js", "@define");
